@@ -1,4 +1,4 @@
-import { handler } from "./traffic-snapshot";
+import { handler } from "../../netlify/functions/traffic-snapshot";
 
 const originalEnv = process.env.GOOGLE_MAPS_API_KEY;
 const originalFetch = global.fetch;
