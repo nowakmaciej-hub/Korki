@@ -191,14 +191,7 @@ export default function App() {
           <p>
             {snapshot.meta.dataSource === "live"
               ? "Zrodlo: live Google Routes."
-              : snapshot.meta.cacheReason === "rate-limit"
-                ? "Pokazuje ostatni zapisany snapshot, bo limit godzinowy zostal osiagniety."
-                : "Pokazuje ostatni zapisany snapshot, bo pobranie live chwilowo sie nie udalo."}
-          </p>
-          <p>
-            Limit godzinowy: {snapshot.meta.rateLimit.requestsUsed}/
-            {snapshot.meta.rateLimit.limitPerHour} zapytan, zostalo{" "}
-            {snapshot.meta.rateLimit.requestsRemaining}.
+              : "Pokazuje ostatni zapisany snapshot, bo pobranie live chwilowo sie nie udalo."}
           </p>
         </section>
       )}

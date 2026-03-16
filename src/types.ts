@@ -58,16 +58,7 @@ export interface RouteResult {
   durationMinutes: number;
 }
 
-export interface RateLimitMeta {
-  limitPerHour: number;
-  requestsPerSnapshot: number;
-  requestsUsed: number;
-  requestsRemaining: number;
-  windowStartedAt: string;
-}
-
 export interface SnapshotMeta {
   dataSource: "live" | "cache";
-  cacheReason?: "rate-limit" | "upstream-error";
-  rateLimit: RateLimitMeta;
+  cacheReason?: "upstream-error";
 }

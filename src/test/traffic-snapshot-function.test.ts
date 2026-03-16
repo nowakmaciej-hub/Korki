@@ -1,5 +1,4 @@
 import { vi } from "vitest";
-import type { TrafficSnapshot } from "../types";
 import { handler } from "../../netlify/functions/traffic-snapshot";
 
 const originalEnv = process.env.GOOGLE_MAPS_API_KEY;
@@ -40,7 +39,6 @@ vi.mock("@netlify/blobs", () => ({
 describe("traffic-snapshot handler", () => {
   afterEach(() => {
     process.env.GOOGLE_MAPS_API_KEY = originalEnv;
-    delete process.env.TRAFFIC_REQUESTS_PER_HOUR;
     global.fetch = originalFetch;
     blobState.clear();
     blobVersion = 0;
@@ -75,7 +73,6 @@ describe("traffic-snapshot handler", () => {
     expect(payload.cities[0].businessRoutes).toHaveLength(3);
     expect(payload.cities[0].residentialRoutes).toHaveLength(3);
     expect(payload.meta.dataSource).toBe("live");
-    expect(payload.meta.rateLimit.requestsUsed).toBe(12);
   });
 
   it("returns a safe error when Google fails", async () => {
@@ -92,9 +89,8 @@ describe("traffic-snapshot handler", () => {
     expect(response?.body).toContain("Could not load live traffic snapshot");
   });
 
-  it("serves the cached snapshot when the hourly limit is exhausted", async () => {
+  it("serves the cached snapshot when Google fails after a successful snapshot", async () => {
     process.env.GOOGLE_MAPS_API_KEY = "test-key";
-    process.env.TRAFFIC_REQUESTS_PER_HOUR = "20";
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -103,15 +99,19 @@ describe("traffic-snapshot handler", () => {
     }) as typeof fetch;
 
     const firstResponse = await handler({} as never, {} as never);
-    const firstPayload = JSON.parse(firstResponse?.body ?? "{}") as TrafficSnapshot;
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 503,
+      text: async () => "Service unavailable"
+    }) as typeof fetch;
+
     const secondResponse = await handler({} as never, {} as never);
-    const secondPayload = JSON.parse(secondResponse?.body ?? "{}") as TrafficSnapshot;
+    const secondPayload = JSON.parse(secondResponse?.body ?? "{}");
 
     expect(firstResponse?.statusCode).toBe(200);
-    expect(firstPayload.meta?.dataSource).toBe("live");
     expect(secondResponse?.statusCode).toBe(200);
     expect(secondPayload.meta?.dataSource).toBe("cache");
-    expect(secondPayload.meta?.cacheReason).toBe("rate-limit");
-    expect(secondPayload.generatedAt).toBe(firstPayload.generatedAt);
+    expect(secondPayload.meta?.cacheReason).toBe("upstream-error");
   });
 });
