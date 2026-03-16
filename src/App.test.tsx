@@ -226,7 +226,8 @@ describe("App", () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
       json: async () => ({
-        error: "Could not load live traffic snapshot."
+        error: "Could not load live traffic snapshot.",
+        details: "Google Routes API failed (403): API key is not authorized."
       })
     }) as typeof fetch;
 
@@ -235,7 +236,11 @@ describe("App", () => {
     expect(
       await screen.findByText("Nie udalo sie pobrac danych")
     ).toBeInTheDocument();
-    expect(screen.getByText("Could not load live traffic snapshot.")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Could not load live traffic snapshot. Google Routes API failed (403): API key is not authorized."
+      )
+    ).toBeInTheDocument();
   });
 
   it("keeps a dedicated responsive grid container", async () => {

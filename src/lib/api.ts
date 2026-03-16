@@ -12,10 +12,13 @@ export async function fetchTrafficSnapshot(): Promise<TrafficSnapshot> {
     | { error?: string; details?: string };
 
   if (!response.ok) {
-    const message =
+    const baseMessage =
       "error" in payload && payload.error
         ? payload.error
         : "Nie udalo sie pobrac danych o ruchu.";
+    const details =
+      "details" in payload && payload.details ? payload.details : null;
+    const message = details ? `${baseMessage} ${details}` : baseMessage;
 
     throw new Error(message);
   }
