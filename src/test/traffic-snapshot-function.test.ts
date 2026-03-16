@@ -9,6 +9,7 @@ const blobState = new Map<string, { data: unknown; etag: string }>();
 let blobVersion = 0;
 
 vi.mock("@netlify/blobs", () => ({
+  connectLambda: vi.fn(),
   getStore: () => ({
     async getWithMetadata<T>(key: string) {
       const entry = blobState.get(key);

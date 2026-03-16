@@ -1,4 +1,4 @@
-import { getStore } from "@netlify/blobs";
+import { connectLambda, getStore } from "@netlify/blobs";
 import type { Handler } from "@netlify/functions";
 import { cityConfigs } from "../../src/data/cities";
 import { fetchGoogleRoute } from "../../src/lib/googleRoutes";
@@ -44,7 +44,9 @@ function buildMeta(
   };
 }
 
-export const handler: Handler = async () => {
+export const handler: Handler = async (event) => {
+  connectLambda(event as never);
+
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
   const requestsPerHour = parseHourlyLimit(process.env.TRAFFIC_REQUESTS_PER_HOUR);
 
