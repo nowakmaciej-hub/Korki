@@ -50,11 +50,10 @@ export const handler: Handler = async (event) => {
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
   const requestsPerHour = parseHourlyLimit(process.env.TRAFFIC_REQUESTS_PER_HOUR);
 
-  const store = getStore({ name: BLOB_STORE_NAME, consistency: "strong" });
+  const store = getStore({ name: BLOB_STORE_NAME });
   const quotaStore = {
     async getWithMetadata<T>(key: string) {
       return store.getWithMetadata(key, {
-        consistency: "strong",
         type: "json"
       }) as Promise<{ data: T | null; etag?: string } | null>;
     },
@@ -79,7 +78,6 @@ export const handler: Handler = async (event) => {
 
     if (!quotaReservation.allowed) {
       const cachedSnapshot = await store.get(SNAPSHOT_CACHE_KEY, {
-        consistency: "strong",
         type: "json"
       });
 
@@ -118,7 +116,6 @@ export const handler: Handler = async (event) => {
         : "Unknown traffic snapshot error.";
 
     const cachedSnapshot = await store.get(SNAPSHOT_CACHE_KEY, {
-      consistency: "strong",
       type: "json"
     });
 
