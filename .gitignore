@@ -1,0 +1,7 @@
+dist
+node_modules
+.netlify
+.DS_Store
+coverage
+.env
+*.tsbuildinfo
