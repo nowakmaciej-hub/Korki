@@ -44,6 +44,7 @@ export interface CitySnapshot {
 export interface TrafficSnapshot {
   generatedAt: string;
   cities: CitySnapshot[];
+  meta?: SnapshotMeta;
 }
 
 export interface RouteRequest {
@@ -55,4 +56,18 @@ export interface RouteRequest {
 export interface RouteResult {
   distanceKm: number;
   durationMinutes: number;
+}
+
+export interface RateLimitMeta {
+  limitPerHour: number;
+  requestsPerSnapshot: number;
+  requestsUsed: number;
+  requestsRemaining: number;
+  windowStartedAt: string;
+}
+
+export interface SnapshotMeta {
+  dataSource: "live" | "cache";
+  cacheReason?: "rate-limit" | "upstream-error";
+  rateLimit: RateLimitMeta;
 }

@@ -176,9 +176,32 @@ export default function App() {
           >
             {refreshing ? "Odswiezanie..." : "Odswiez probke"}
           </button>
-          <p className="hero__hint">Dane sa zawsze bez cache i tylko dla auta.</p>
+          <p className="hero__hint">
+            Dane live dla auta, z bezpiecznym fallbackiem do ostatniego snapshotu.
+          </p>
         </div>
       </header>
+
+      {snapshot?.meta && (
+        <section
+          className={`status-inline ${
+            snapshot.meta.dataSource === "cache" ? "status-inline--warn" : ""
+          }`}
+        >
+          <p>
+            {snapshot.meta.dataSource === "live"
+              ? "Zrodlo: live Google Routes."
+              : snapshot.meta.cacheReason === "rate-limit"
+                ? "Pokazuje ostatni zapisany snapshot, bo limit godzinowy zostal osiagniety."
+                : "Pokazuje ostatni zapisany snapshot, bo pobranie live chwilowo sie nie udalo."}
+          </p>
+          <p>
+            Limit godzinowy: {snapshot.meta.rateLimit.requestsUsed}/
+            {snapshot.meta.rateLimit.limitPerHour} zapytan, zostalo{" "}
+            {snapshot.meta.rateLimit.requestsRemaining}.
+          </p>
+        </section>
+      )}
 
       {loading && (
         <section className="status-card" aria-live="polite">
